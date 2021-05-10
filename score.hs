@@ -74,11 +74,11 @@ type Scores = Map.Map
 (!!!) :: (Ord player, Num score) => Scores player score -> player -> score
 s !!! p = Map.findWithDefault 0 p s
 
-scoreSum :: (Ord player, Fractional field) =>
+scoreSum :: (Ord player, Fractional field, Eq field) =>
         player -> [Scores player field] -> Scores player field
 scoreSum p ss = Map.unionsWith (+) [ (s!!!p / pSum *) <$> s | s <- ss ]
-        where
-                pSum = sum [ s!!!p | s <- ss ]
+        where pSum = let t = sum [ s!!!p | s <- ss ] in
+                if t == 0 then 1 else t
 
 horis rows cols n = do
         i <- [1..rows]
@@ -106,12 +106,12 @@ aligns n (Board b) = [ p
         ]
 
 n = 3
-treeAcc :: (Ord player, Fractional score)
+treeAcc :: (Ord player, Fractional score, Eq score)
         => Scores player score
         -> Puissance4State player
         -> [Scores player score]
         -> Scores player score
 treeAcc def State { turn=t, board=board } ss
         | null as = if null ss then def else scoreSum t ss
-        | otherwise = Map.fromList [ (p, 1/fromIntegral (length ps)) | p <- ps ]  -- FINISH THIS
+        | otherwise = Map.fromList [ (p, 1/fromIntegral (length ps)) | p <- ps ]
         where as = aligns n board; ps = nub as
