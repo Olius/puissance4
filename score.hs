@@ -48,14 +48,16 @@ play (Board a) p col = do
 class Cyclic a where
         next :: a -> a
 
-moves :: Cyclic player => Puissance4State player -> [Puissance4State player]
-moves (State { turn = t, board = board@(Board a)}) = map state boards where
-        boards = mapMaybe (play board t) $ cols a
-        state b = State { turn = next t, board = b}
+moves :: Cyclic player =>
+        Puissance4State player -> [(Col,Puissance4State player)]
+moves (State { turn = t, board = board@(Board a)}) = mapMaybe wrap $ cols a
+        where wrap c =
+                (\b -> (c, State { turn = next t, board = b }))
+                <$> play board t c
 
 moveTree :: Cyclic player =>
-        Puissance4State player -> Tree (Puissance4State player)
-moveTree = unfoldTree (\b -> (b, moves b))
+        (Col, Puissance4State player) -> Tree (Col, Puissance4State player)
+moveTree = unfoldTree (\p@(c,b) -> (p, moves b))
 
 printTree :: Show a => Tree a -> IO ()
 printTree = putStr . drawTree . fmap show
