@@ -72,7 +72,7 @@ printTree = putStr . drawTree . fmap show
 
 type Scores = Map.Map
 (!!!) :: (Ord player, Num score) => Scores player score -> player -> score
-s !!! p = Map.findWithDefault 1 p s
+s !!! p = Map.findWithDefault 0 p s
 
 scoreSum :: (Ord player, Fractional field) =>
         player -> [Scores player field] -> Scores player field
