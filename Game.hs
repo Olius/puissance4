@@ -10,6 +10,10 @@ data Player = Human
                  , Show
                  )
 
+other :: Player -> Player
+other Human = AI
+other AI = Human
+
 type ICol = Word
 type IRow = Word
 type NWin = Word
@@ -49,3 +53,10 @@ won n b = (`elem` winners) where
                 , j0 <- range (c0,c1-n+1)
                 ]
         ((r0,c0),(r1,c1)) = bounds b
+
+data State = State { turn :: Player
+                   , board :: Board
+                   }
+
+playTurn :: ICol -> State -> Maybe State
+playTurn c (State p b) = State (other p) <$> play (Move p c) b
