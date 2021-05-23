@@ -1,7 +1,9 @@
 module Tree where
 
 import Data.Array
+import Data.List
 import Data.Maybe
+import Data.Ord
 import Data.Tree
 
 import Game
@@ -27,3 +29,9 @@ cum n = foldTree maxmin where
         maxmin (State p _) ss                   = mix p ss
         mix AI    = maximum
         mix Human = minimum
+
+playAI :: NWin -> Int -> Tree State -> Tree State
+playAI n d t = snd $ maximumBy (comparing fst) scoredMoves where
+        scoredMoves = scores `zip` subForest t
+        Node _ moves = trim d t
+        scores = cum n <$> moves
