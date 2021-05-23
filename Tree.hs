@@ -15,3 +15,15 @@ playTree = unfoldTree tuple where
 trim :: Int -> Tree a -> Tree a
 trim 0 (Node a _ ) = Node a []
 trim n (Node a as) = Node a $ trim (n-1) <$> as
+
+data Score = HumanWin | Other | AIWin
+        deriving (Eq, Ord, Show)
+
+cum :: NWin -> Tree State -> Score
+cum n = foldTree maxmin where
+        maxmin (State _ b) [] | won n b AI      = AIWin
+                              | won n b Human   = HumanWin
+                              | otherwise       = Other
+        maxmin (State p _) ss                   = mix p ss
+        mix AI    = maximum
+        mix Human = minimum
